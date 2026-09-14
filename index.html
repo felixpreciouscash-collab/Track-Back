@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>Track Back</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#080a0f;
+  color:#f5f7fa;
+  min-height:100vh;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.app{
+  max-width:520px;
+  margin:auto;
+  min-height:100vh;
+  padding-bottom:90px;
+}
+header{
+  padding:28px 20px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{
+  font-size:25px;
+  font-weight:800;
+}
+.logo span{color:#7c5cff}
+.sub{
+  color:#858b98;
+  font-size:12px;
+  margin-top:4px;
+}
+.icon-btn{
+  width:42px;height:42px;
+  border:1px solid #242936;
+  border-radius:14px;
+  background:#11141b;
+  color:white;
+}
+main{padding:0 16px}
+.page{display:none}
+.page.active{display:block}
+.hero{
+  background:linear-gradient(145deg,#151827,#0f1118);
+  border:1px solid #242938;
+  border-radius:25px;
+  padding:24px;
+  margin-bottom:15px;
+}
+.hero small{color:#8d94a3}
+.big{
+  font-size:52px;
+  font-weight:800;
+  margin:8px 0;
+}
+.streak-label{color:#9ca3b3}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:15px;
+}
+.card{
+  background:#11141b;
+  border:1px solid #242936;
+  border-radius:20px;
+  padding:18px;
+}
+.card h3{font-size:15px;margin-bottom:8px}
+.number{
+  font-size:28px;
+  font-weight:800;
+}
+.muted{color:#858c9b;font-size:13px}
+.primary{
+  width:100%;
+  border:0;
+  border-radius:15px;
+  padding:14px;
+  background:#7c5cff;
+  color:white;
+  font-weight:700;
+  margin-top:14px;
+}
+.secondary{
+  width:100%;
+  border:1px solid #303544;
+  border-radius:15px;
+  padding:13px;
+  background:#151821;
+  color:white;
+  font-weight:600;
+  margin-top:10px;
+}
+.danger{
+  background:#211217;
+  border:1px solid #54242d;
+  color:#ff8f9b;
+}
+.section-title{
+  font-size:18px;
+  font-weight:750;
+  margin:20px 0 10px;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+input,textarea{
+  width:100%;
+  background:#0d1016;
+  color:white;
+  border:1px solid #292e3a;
+  border-radius:14px;
+  padding:13px;
+  outline:none;
+}
+textarea{min-height:140px;resize:vertical}
+label{
+  display:block;
+  color:#a3a9b6;
+  font-size:13px;
+  margin:12px 0 7px;
+}
+.nav{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(520px,100%);
+  background:rgba(12,14,20,.96);
+  backdrop-filter:blur(15px);
+  border-top:1px solid #252a35;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  padding:9px 6px 10px;
+  z-index:20;
+}
+.nav button{
+  background:none;
+  border:0;
+  color:#747b8a;
+  font-size:10px;
+  padding:6px 2px;
+}
+.nav button.active{color:#9b84ff}
+.nav .emoji{font-size:20px;display:block;margin-bottom:3px}
+.progress{
+  height:9px;
+  background:#20242e;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:12px;
+}
+.progress div{
+  height:100%;
+  background:#7c5cff;
+  border-radius:20px;
+}
+.badges{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.badge{
+  border:1px solid #292e3a;
+  border-radius:17px;
+  padding:16px;
+  background:#10131a;
+}
+.badge.locked{opacity:.35}
+.badge-icon{font-size:25px;margin-bottom:8px}
+.journal-item{
+  border:1px solid #292e3a;
+  background:#11141b;
+  padding:15px;
+  border-radius:17px;
+  margin-bottom:10px;
+}
+.journal-date{font-size:11px;color:#737b8a;margin-bottom:7px}
+.meter{
+  display:flex;
+  gap:7px;
+  margin:10px 0;
+}
+.meter button{
+  flex:1;
+  padding:11px 3px;
+  border-radius:10px;
+  border:1px solid #2a2f3b;
+  background:#12151c;
+  color:#9299a8;
+}
+.meter button.selected{
+  background:#7c5cff;
+  color:white;
+  border-color:#7c5cff;
+}
+.empty{
+  text-align:center;
+  color:#747b89;
+  padding:30px 10px;
+}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:50;
+  padding:25px;
+}
+.modal.show{display:flex;align-items:center;justify-content:center}
+.modal-box{
+  width:min(460px,100%);
+  background:#11141b;
+  border:1px solid #2b303d;
+  border-radius:23px;
+  padding:22px;
+}
+.timer{
+  font-size:70px;
+  text-align:center;
+  font-weight:800;
+  margin:20px 0;
+}
+.quote{
+  color:#b4bac7;
+  font-style:italic;
+  line-height:1.5;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div>
+    <div class="logo">Track<span>Back</span></div>
+    <div class="sub">Own your progress.</div>
+  </div>
+  <button class="icon-btn" onclick="showPage('settings')">⚙️</button>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+<div class="hero">
+  <small>SELF-CONTROL STREAK</small>
+  <div class="big" id="mainStreak">0</div>
+  <div class="streak-label">days strong</div>
+  <button class="primary" onclick="openUrge()">⚡ I'm Having an Urge</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>Longest</h3>
+    <div class="number" id="longest">0</div>
+    <div class="muted">days</div>
+  </div>
+
+  <div class="card">
+    <h3>Partner streak</h3>
+    <div class="number" id="partnerStreak">0</div>
+    <div class="muted">days</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div>
+      <h3>Today's check-in</h3>
+      <div class="muted">Keep yourself accountable.</div>
+    </div>
+    <span id="checkStatus">⭕</span>
+  </div>
+  <button class="secondary" onclick="showPage('checkin')">Check in</button>
+</div>
+
+<div class="section-title">Your reminder</div>
+
+<div class="card">
+  <div class="quote" id="quote">
+    "You don't need to be perfect. You just need to keep choosing the person you're becoming."
+  </div>
+</div>
+
+</section>
+
+
+<!-- CHECK-IN -->
+<section id="checkin" class="page">
+
+<div class="section-title">Daily Check-in</div>
+
+<div class="card">
+  <label>How are you feeling?</label>
+  <div class="meter" id="mood">
+    <button onclick="selectMood(1)">😞</button>
+    <button onclick="selectMood(2)">😕</button>
+    <button onclick="selectMood(3)">😐</button>
+    <button onclick="selectMood(4)">🙂</button>
+    <button onclick="selectMood(5)">😁</button>
+  </div>
+
+  <label>Urge level</label>
+  <div class="meter" id="urge">
+    <button onclick="selectUrge(1)">1</button>
+    <button onclick="selectUrge(2)">2</button>
+    <button onclick="selectUrge(3)">3</button>
+    <button onclick="selectUrge(4)">4</button>
+    <button onclick="selectUrge(5)">5</button>
+  </div>
+
+  <label>Optional note</label>
+  <textarea id="checkNote" placeholder="What's going on today?"></textarea>
+
+  <button class="primary" onclick="saveCheckin()">Save Check-in</button>
+</div>
+
+</section>
+
+
+<!-- JOURNAL -->
+<section id="journal" class="page">
+
+<div class="section-title">Private Journal</div>
+
+<div class="card">
+  <label>Write freely</label>
+  <textarea id="journalText" placeholder="Write about your thoughts, feelings, triggers, wins or goals..."></textarea>
+  <button class="primary" onclick="saveJournal()">Save Entry</button>
+</div>
+
+<div class="section-title">Entries</div>
+<div id="journalList"></div>
+
+</section>
+
+
+<!-- COUPLE -->
+<section id="couple" class="page">
+
+<div class="section-title">Couples Mode</div>
+
+<div class="hero">
+  <small>YOUR COUPLE STATUS</small>
+  <div class="big" id="coupleStatus">Solo</div>
+  <div class="streak-label">Connect with your partner when you're ready.</div>
+</div>
+
+<div class="card">
+  <h3>Partner connection</h3>
+  <p class="muted" style="margin-top:7px">
+    Pair with your consenting adult partner using a temporary code.
+  </p>
+
+  <label>Your pairing code</label>
+  <input id="pairCode" readonly>
+
+  <button class="primary" onclick="generateCode()">Generate Pairing Code</button>
+
+  <label>Partner's code</label>
+  <input id="partnerCode" placeholder="Enter their code">
+
+  <button class="secondary" onclick="connectPartner()">Connect Partner</button>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <h3>Privacy</h3>
+  <p class="muted" style="margin-top:7px">
+    Your private journal and personal notes stay private unless you deliberately choose to share them.
+  </p>
+</div>
+
+</section>
+
+
+<!-- PROGRESS -->
+<section id="progress" class="page">
+
+<div class="section-title">Progress</div>
+
+<div class="card">
+  <h3>Self-control</h3>
+  <div class="number" id="progressStreak">0 days</div>
+  <div class="progress">
+    <div id="progressBar"></div>
+  </div>
+  <div class="muted" id="nextGoal">Next milestone: 7 days</div>
+</div>
+
+<div class="section-title">Milestones</div>
+
+<div class="badges" id="badges"></div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+
+<div class="section-title">Settings</div>
+
+<div class="card">
+  <h3>Streak start date</h3>
+  <label>Self-control start</label>
+  <input type="date" id="startDate">
+  <button class="primary" onclick="saveStartDate()">Save Start Date</button>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <h3>Accountability</h3>
+  <p class="muted" style="margin-top:7px">
+    If you relapse, log it honestly. The purpose is accountability, not shame.
+  </p>
+  <button class="secondary danger" onclick="resetStreak()">Log Accountability Event / Reset</button>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <h3>Data</h3>
+  <button class="secondary" onclick="exportData()">Export My Data</button>
+  <button class="secondary danger" onclick="deleteData()">Delete All Data</button>
+</div>
+
+</section>
+
+</main>
+
+<nav class="nav">
+  <button class="active" onclick="showPage('home',this)">
+    <span class="emoji">🏠</span>Home
+  </button>
+  <button onclick="showPage('checkin',this)">
+    <span class="emoji">✅</span>Check-in
+  </button>
+  <button onclick="showPage('journal',this)">
+    <span class="emoji">📓</span>Journal
+  </button>
+  <button onclick="showPage('couple',this)">
+    <span class="emoji">❤️</span>Couple
+  </button>
+  <button onclick="showPage('progress',this)">
+    <span class="emoji">📈</span>Progress
+  </button>
+</nav>
+
+</div>
+
+
+<!-- URGE MODAL -->
+<div class="modal" id="urgeModal">
+<div class="modal-box">
+
+<h2>⚡ Ride the Urge</h2>
+<p class="muted" style="margin-top:8px">
+You don't have to act on an urge. Give yourself 60 seconds.
+</p>
+
+<div class="timer" id="timer">60</div>
+
+<div class="quote">
+Breathe slowly. Notice your surroundings. Let the urge rise and fall without acting on it.
+</div>
+
+<button class="primary" id="timerBtn" onclick="startTimer()">Start 60 Seconds</button>
+<button class="secondary" onclick="survivedUrge()">I Survived the Urge 💪</button>
+<button class="secondary" onclick="closeUrge()">Close</button>
+
+</div>
+</div>
+
+
+<script>
+
+const KEY="trackBackData";
+
+let data=JSON.parse(localStorage.getItem(KEY)) || {
+  startDate:null,
+  longest:0,
+  partnerStart:null,
+  checkins:[],
+  journals:[],
+  pairCode:null
+};
+
+let selectedMood=0;
+let selectedUrge=0;
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function today(){
+  return new Date().toISOString().split("T")[0];
+}
+
+function daysSince(date){
+  if(!date)return 0;
+  const start=new Date(date+"T00:00:00");
+  const now=new Date();
+  now.setHours(0,0,0,0);
+  return Math.max(0,Math.floor((now-start)/86400000));
+}
+
+function currentStreak(){
+  return daysSince(data.startDate);
+}
+
+function updateUI(){
+
+  const streak=currentStreak();
+
+  if(streak>data.longest){
+    data.longest=streak;
+    save();
+  }
+
+  document.getElementById("mainStreak").textContent=streak;
+  document.getElementById("longest").textContent=data.longest;
+  document.getElementById("progressStreak").textContent=streak+" days";
+
+  const ps=daysSince(data.partnerStart);
+  document.getElementById("partnerStreak").textContent=ps;
+
+  document.getElementById("startDate").value=data.startDate||"";
+
+  document.getElementById("checkStatus").textContent=
+    data.checkins.some(x=>x.date===today())?"✅":"⭕";
+
+  updateProgress(streak);
+  renderJournals();
+
+  document.getElementById("coupleStatus").textContent=
+    data.partnerStart?"Connected":"Solo";
+}
+
+function showPage(id,button){
+
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+  document.getElementById(id).classList.add("active");
+
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+
+  if(button)button.classList.add("active");
+
+  window.scrollTo(0,0);
+}
+
+function selectMood(n){
+  selectedMood=n;
+  [...document.querySelectorAll("#mood button")].forEach((b,i)=>{
+    b.classList.toggle("selected",i===n-1);
+  });
+}
+
+function selectUrge(n){
+  selectedUrge=n;
+  [...document.querySelectorAll("#urge button")].forEach((b,i)=>{
+    b.classList.toggle("selected",i===n-1);
+  });
+}
+
+function saveCheckin(){
+
+  data.checkins.unshift({
+    date:today(),
+    mood:selectedMood,
+    urge:selectedUrge,
+    note:document.getElementById("checkNote").value.trim()
+  });
+
+  save();
+
+  document.getElementById("checkNote").value="";
+  selectedMood=0;
+  selectedUrge=0;
+
+  alert("Check-in saved ✅");
+  updateUI();
+}
+
+function saveJournal(){
+
+  const text=document.getElementById("journalText").value.trim();
+
+  if(!text){
+    alert("Write something first.");
+    return;
+  }
+
+  data.journals.unshift({
+    date:new Date().toLocaleString(),
+    text
+  });
+
+  save();
+
+  document.getElementById("journalText").value="";
+
+  renderJournals();
+  alert("Journal entry saved 🔒");
+}
+
+function renderJournals(){
+
+  const box=document.getElementById("journalList");
+
+  if(!data.journals.length){
+    box.innerHTML='<div class="empty">No journal entries yet.</div>';
+    return;
+  }
+
+  box.innerHTML=data.journals.map(x=>`
+    <div class="journal-item">
+      <div class="journal-date">${escapeHTML(x.date)}</div>
+      <div>${escapeHTML(x.text)}</div>
+    </div>
+  `).join("");
+}
+
+function escapeHTML(text){
+  return text.replace(/[&<>"']/g,m=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function openUrge(){
+  document.getElementById("urgeModal").classList.add("show");
+}
+
+function closeUrge(){
+  document.getElementById("urgeModal").classList.remove("show");
+}
+
+let timerInterval=null;
+let timeLeft=60;
+
+function startTimer(){
+
+  if(timerInterval)return;
+
+  timeLeft=60;
+  document.getElementById("timer").textContent=timeLeft;
+
+  timerInterval=setInterval(()=>{
+
+    timeLeft--;
+
+    document.getElementById("timer").textContent=timeLeft;
+
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      timerInterval=null;
+      document.getElementById("timerBtn").textContent="Finished ✅";
+      alert("60 seconds completed. You made it through.");
+    }
+
+  },1000);
+}
+
+function survivedUrge(){
+  clearInterval(timerInterval);
+  timerInterval=null;
+
+  alert("That's a win. Keep moving forward 💪");
+
+  closeUrge();
+}
+
+function generateCode(){
+
+  data.pairCode=
+    Math.random().toString(36).substring(2,8).toUpperCase();
+
+  document.getElementById("pairCode").value=data.pairCode;
+
+  save();
+}
+
+function connectPartner(){
+
+  const code=document.getElementById("partnerCode").value.trim().toUpperCase();
+
+  if(code.length<4){
+    alert("Enter a valid pairing code.");
+    return;
+  }
+
+  data.partnerStart=today();
+  save();
+
+  alert("Partner connection created for this device ❤️");
+
+  updateUI();
+}
+
+function saveStartDate(){
+
+  const date=document.getElementById("startDate").value;
+
+  if(!date){
+    alert("Choose a date.");
+    return;
+  }
+
+  data.startDate=date;
+  save();
+  updateUI();
+
+  alert("Start date saved.");
+}
+
+function resetStreak(){
+
+  const ok=confirm(
+    "Log an accountability event and reset your self-control streak?"
+  );
+
+  if(!ok)return;
+
+  const current=currentStreak();
+
+  if(current>data.longest)
+    data.longest=current;
+
+  data.startDate=today();
+
+  save();
+  updateUI();
+
+  alert("Accountability event recorded. Start again.");
+}
+
+function updateProgress(streak){
+
+  const goals=[7,14,30,60,90,180,365];
+
+  let next=goals.find(x=>streak<x);
+
+  if(!next)next=365;
+
+  const previous=goals.filter(x=>x<=streak).pop()||0;
+
+  const percent=
+    Math.min(100,
+      ((streak-previous)/(next-previous))*100
+    );
+
+  document.getElementById("progressBar").style.width=
+    Math.max(0,percent)+"%";
+
+  document.getElementById("nextGoal").textContent=
+    streak>=365
+      ?"🏆 365-day milestone reached!"
+      :"Next milestone: "+next+" days";
+
+  document.getElementById("badges").innerHTML=
+    goals.map(g=>`
+      <div class="badge ${streak>=g?"":"locked"}">
+        <div class="badge-icon">${streak>=g?"🏆":"🔒"}</div>
+        <b>${g} Days</b>
+        <div class="muted">${streak>=g?"Unlocked":"Keep going"}</div>
+      </div>
+    `).join("");
+}
+
+function exportData(){
+
+  const blob=new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="track-back-data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function deleteData(){
+
+  const ok=confirm(
+    "Delete ALL Track Back data from this device?"
+  );
+
+  if(!ok)return;
+
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+const quotes=[
+  "You don't need to be perfect. You just need to keep choosing the person you're becoming.",
+  "An urge is temporary. Your decision can last.",
+  "Discipline is choosing what you want most over what you want now.",
+  "One difficult moment doesn't define you.",
+  "Track the progress. Learn from the setbacks. Keep moving."
+];
+
+document.getElementById("quote").textContent=
+  '"'+quotes[Math.floor(Math.random()*quotes.length)]+'"';
+
+updateUI();
+
+</script>
+
+</body>
+  </html>
